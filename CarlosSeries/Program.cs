@@ -5,12 +5,182 @@ namespace CarlosSeries
 {
     class Program
     {
-        static SerieRepositorio repositorio = new SerieRepositorio();
+        static SerieRepositorio repositorioSerie = new SerieRepositorio();
+        static FilmeRepositorio repositorioFilme = new FilmeRepositorio();
         static void Main(string[] args)
         {
-            string opcaoUsuario = ObterOpcaoUsuario();
+            MenuPrincipal();
 
-            while(opcaoUsuario.ToUpper() != "X")
+
+            
+
+            
+        }
+
+        private static void MenuPrincipal()
+        {
+            Console.WriteLine("Deseja acessar filmes ou series? Digite F e S para series.");
+            string opcaoUsuario = Console.ReadLine();
+            if (opcaoUsuario.ToUpper() == "S")
+            {
+                OpcoesSeries();
+            }
+            else if (opcaoUsuario.ToUpper() == "F")
+            {
+                OpcoesFilmes();
+            }
+        }
+
+        private static void OpcoesFilmes()
+        {
+            string opcaoUsuario = ObterOpcaoUsuarioFilmes();
+
+
+            while (opcaoUsuario.ToUpper() != "X")
+            {
+                switch (opcaoUsuario)
+                {
+                    case "1":
+                        ListarFilmes();
+                        break;
+
+                    case "2":
+                        InserirFilmes();
+                        break;
+                    case "3":
+                        AtualizarFilmes();
+                        break;
+                    case "4":
+                        ExcluirFilmes();
+                        break;
+                    case "5":
+                        VisualizarFilmes();
+                        break;
+                    case "C":
+                        Console.Clear();
+                        break;
+
+                    case "V":
+                        MenuPrincipal();
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                opcaoUsuario = ObterOpcaoUsuarioFilmes();
+            }
+            Console.WriteLine("Obrigado por utilizar nossos serviços.");
+            Console.ReadLine();
+        }
+
+        private static void VisualizarFilmes()
+        {
+            Console.WriteLine("Digite o ID do filme: ");
+            int indiceFilme = int.Parse(Console.ReadLine());
+
+            var filme = repositorioFilme.RetornaPorId(indiceFilme);
+            Console.WriteLine(filme);
+        }
+
+        private static void ExcluirFilmes()
+        {
+            Console.WriteLine("Digite o ID da filme: ");
+            int indiceFilme = int.Parse(Console.ReadLine());
+            Console.WriteLine("Deseja mesmo excluir este filme? Para excluir digite S senão digite N ");
+            string confirmacao = Console.ReadLine();
+            if (confirmacao == "S")
+            {
+                repositorioFilme.Exclui(indiceFilme);
+            }
+            else
+            {
+                ObterOpcaoUsuarioFilmes();
+            }
+        }
+
+        private static void AtualizarFilmes()
+        {
+            Console.WriteLine("Digite o ID da serie: ");
+            int indiceFilme = int.Parse(Console.ReadLine());
+
+            foreach (int i in Enum.GetValues(typeof(Genero)))
+            {
+                Console.WriteLine("{0} - {1}", i, Enum.GetName(typeof(Genero), i));
+            }
+            Console.WriteLine("Digite o genero entr as opções a acima:");
+            int entradaGenero = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Digite o Titulo da filme: ");
+            string entradaTitulo = Console.ReadLine();
+
+            Console.WriteLine("Digite o ano da filme: ");
+            int entradaAno = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Digite a Descrição da filme: ");
+            string entradaDescricao = Console.ReadLine();
+
+            Filme atualizaFilme = new Filme(Id: indiceFilme,
+                genero: (Genero)entradaGenero,
+                titulo: entradaTitulo,
+                ano: entradaAno,
+                descricao: entradaDescricao
+                );
+            repositorioFilme.Atualiza(indiceFilme, atualizaFilme);
+        }
+
+        private static void InserirFilmes()
+        {
+            Console.WriteLine("Inserir novo filme");
+
+            foreach (int i in Enum.GetValues(typeof(Genero)))
+            {
+                Console.WriteLine("{0} - {1}", i, Enum.GetName(typeof(Genero), i));
+            }
+            Console.WriteLine("Digite o genero entr as opções a acima:");
+            int entradaGenero = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Digite o Titulo da filme: ");
+            string entradaTitulo = Console.ReadLine();
+
+            Console.WriteLine("Digite o ano da filme: ");
+            int entradaAno = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Digite a Descrição da filme: ");
+            string entradaDescricao = Console.ReadLine();
+
+            Filme novoFilme = new Filme(Id: repositorioFilme.ProximoId(),
+                genero: (Genero)entradaGenero,
+                titulo: entradaTitulo,
+                ano: entradaAno,
+                descricao: entradaDescricao
+                );
+            repositorioFilme.Insere(novoFilme);
+        }
+
+        private static void ListarFilmes()
+        {
+            Console.WriteLine("Listar filme");
+
+            var lista = repositorioFilme.Lista();
+
+            if (lista.Count == 0)
+            {
+                Console.WriteLine("Nenhuma filme cadastrado.");
+                return;
+            }
+            foreach (var filme in lista)
+            {
+                var excluido = filme.retornaExcluido();
+                Console.WriteLine("#ID {0}: - {1} {2}", filme.retornaId(), filme.retornaTitulo(), (excluido ? "*Excluido*" : ""));
+            }
+        }
+
+        private static void OpcoesSeries()
+        {
+            string opcaoUsuario = ObterOpcaoUsuarioSeries();
+
+            
+            while (opcaoUsuario.ToUpper() != "X")
             {
                 switch (opcaoUsuario)
                 {
@@ -33,11 +203,14 @@ namespace CarlosSeries
                     case "C":
                         Console.Clear();
                         break;
+                    case "V":
+                        MenuPrincipal();
+                        break;
 
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                opcaoUsuario = ObterOpcaoUsuario();
+                opcaoUsuario = ObterOpcaoUsuarioSeries();
             }
             Console.WriteLine("Obrigado por utilizar nossos serviços.");
             Console.ReadLine();
@@ -70,7 +243,7 @@ namespace CarlosSeries
                 ano: entradaAno,
                 descricao: entradaDescricao
                 );
-            repositorio.Atualiza(indiceSerie, atualizaSerie);
+            repositorioSerie.Atualiza(indiceSerie, atualizaSerie);
 
         }
 
@@ -82,11 +255,11 @@ namespace CarlosSeries
             string confirmacao = Console.ReadLine();            
             if (confirmacao == "S")
             {
-                repositorio.Exclui(indiceSerie);
+                repositorioSerie.Exclui(indiceSerie);
             }
             else
             {
-                ObterOpcaoUsuario();
+                ObterOpcaoUsuarioSeries();
             }
 
 
@@ -98,7 +271,7 @@ namespace CarlosSeries
             Console.WriteLine("Digite o ID da serie: ");
             int indiceSerie = int.Parse(Console.ReadLine());
 
-            var serie = repositorio.RetornaPorId(indiceSerie);
+            var serie = repositorioSerie.RetornaPorId(indiceSerie);
             Console.WriteLine(serie);
         }
 
@@ -122,13 +295,13 @@ namespace CarlosSeries
             Console.WriteLine("Digite a Descrição da serie: ");
             string entradaDescricao = Console.ReadLine();
 
-            Serie novaSerie = new Serie(Id: repositorio.ProximoId(),
+            Serie novaSerie = new Serie(Id: repositorioSerie.ProximoId(),
                 genero: (Genero)entradaGenero,
                 titulo: entradaTitulo,
                 ano: entradaAno,
                 descricao: entradaDescricao
                 );
-            repositorio.Insere(novaSerie);
+            repositorioSerie.Insere(novaSerie);
 
         }
 
@@ -136,7 +309,7 @@ namespace CarlosSeries
         {
             Console.WriteLine("Listar series");
 
-            var lista = repositorio.Lista();
+            var lista = repositorioSerie.Lista();
 
             if(lista.Count == 0)
             {
@@ -152,7 +325,7 @@ namespace CarlosSeries
 
 
 
-        private static string ObterOpcaoUsuario()
+        private static string ObterOpcaoUsuarioSeries()
         {
             Console.WriteLine();
             Console.WriteLine("Carlos Series a seu dispor!!");
@@ -163,6 +336,29 @@ namespace CarlosSeries
             Console.WriteLine("3 - Atualizar serie");
             Console.WriteLine("4 - Excluir serie");
             Console.WriteLine("5 - Visualizar serie");
+            Console.WriteLine("C - Limpar tela");
+            Console.WriteLine("V - Voltar");
+            Console.WriteLine("X - Sair");
+            Console.WriteLine();
+
+            string opcaoUsuario = Console.ReadLine().ToUpper();
+            Console.WriteLine();
+            return opcaoUsuario;
+
+
+
+        }
+        private static string ObterOpcaoUsuarioFilmes()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Carlos Filmes e Series a seu dispor!!");
+            Console.WriteLine("Informe a opcao desejada: ");
+
+            Console.WriteLine("1 - Listar Filmes");
+            Console.WriteLine("2 - Inserir novo Filme");
+            Console.WriteLine("3 - Atualizar Filmes");
+            Console.WriteLine("4 - Excluir Filmes");
+            Console.WriteLine("5 - Visualizar Filmes");
             Console.WriteLine("C - Limpar tela");
             Console.WriteLine("X - Sair");
             Console.WriteLine();
